@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Inequality Mini Project</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        h2 {
+            color: #1a2a6c;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #b21f1f;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+        }
+        
+        .factors-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .factor {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #1a2a6c;
+        }
+        
+        .factor h3 {
+            color: #1a2a6c;
+            margin-bottom: 0.5rem;
+        }
+        
+        .solutions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .solution {
+            background: #f0f7ff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .solution h3 {
+            color: #1a2a6c;
+            margin-bottom: 0.5rem;
+        }
+        
+        .calculator {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-top: 1.5rem;
+        }
+        
+        .calculator h3 {
+            margin-bottom: 1rem;
+            color: #1a2a6c;
+        }
+        
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background: #1a2a6c;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+        
+        button:hover {
+            background: #0d1a4a;
+        }
+        
+        .result {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #e8f4fd;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        footer {
+            background: #1a2a6c;
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .section {
+                padding: 1.5rem;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Income Inequality</h1>
+        <p class="subtitle">Understanding the gap between the rich and the poor in modern societies</p>
+    </header>
+    
+    <div class="container">
+        <section class="section">
+            <h2>What is Income Inequality?</h2>
+            <p>Income inequality refers to the unequal distribution of income across various participants in an economy. It's often presented as the percentage of income earned by a certain percentage of the population.</p>
+            <p>High levels of income inequality can lead to social and economic problems, including reduced economic growth, social unrest, and health disparities.</p>
+            
+            <div class="chart-container">
+                <canvas id="inequalityChart"></canvas>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2>Key Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">26%</div>
+                    <div class="stat-label">of global wealth is owned by the top 1%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">50%</div>
+                    <div class="stat-label">of the world's population owns just 2% of total wealth</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">10×</div>
+                    <div class="stat-label">CEO pay has grown 10x faster than typical worker pay</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">70%</div>
+                    <div class="stat-label">of the world lives in countries where inequality has grown</div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2>Causes of Income Inequality</h2>
+            <div class="factors-list">
+                <div class="factor">
+                    <h3>Technology & Automation</h3>
+                    <p>Automation and technological advances have reduced demand for low-skilled labor while increasing demand for high-skilled workers.</p>
+                </div>
+                <div class="factor">
+                    <h3>Globalization</h3>
+                    <p>Global trade and outsourcing have led to job losses in developed countries while creating opportunities in developing nations.</p>
+                </div>
+                <div class="factor">
+                    <h3>Education Disparities</h3>
+                    <p>Access to quality education varies significantly, creating a skills gap that translates into income differences.</p>
+                </div>
+                <div class="factor">
+                    <h3>Tax Policies</h3>
+                    <p>Tax systems that favor capital gains over labor income can exacerbate wealth concentration at the top.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2>Potential Solutions</h2>
+            <div class="solutions">
+                <div class="solution">
+                    <h3>Progressive Taxation</h3>
+                    <p>Implement tax systems where higher income earners pay a larger percentage of their income in taxes.</p>
+                </div>
+                <div class="solution">
+                    <h3>Education Access</h3>
+                    <p>Invest in quality education for all, including vocational training and lifelong learning opportunities.</p>
+                </div>
+                <div class="solution">
+                    <h3>Minimum Wage Increases</h3>
+                    <p>Raise minimum wages to ensure workers can meet basic needs and participate fully in the economy.</p>
+                </div>
+                <div class="solution">
+                    <h3>Wealth Redistribution</h3>
+                    <p>Implement policies like universal basic income or social safety nets to reduce extreme poverty.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2>Income Comparison Calculator</h2>
+            <p>See how your income compares to others and understand where you stand in the income distribution.</p>
+            
+            <div class="calculator">
+                <h3>Enter Your Information</h3>
+                <div class="input-group">
+                    <label for="country">Country</label>
+                    <select id="country">
+                        <option value="usa">United States</option>
+                        <option value="uk">United Kingdom</option>
+                        <option value="germany">Germany</option>
+                        <option value="india">India</option>
+                        <option value="brazil">Brazil</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="income">Annual Income (USD)</label>
+                    <input type="number" id="income" placeholder="Enter your annual income">
+                </div>
+                <button id="calculateBtn">Calculate My Position</button>
+                
+                <div class="result" id="result">
+                    <h3>Your Income Position</h3>
+                    <p id="resultText"></p>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <p>Income Inequality Mini Project &copy; 2023</p>
+        <p>Data sources: World Inequality Database, OECD, World Bank</p>
+    </footer>
+
+    <script>
+        // Chart.js for income distribution visualization
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('inequalityChart').getContext('2d');
+            
+            // Income distribution data (hypothetical for demonstration)
+            const incomeDistributionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Bottom 20%', 'Second 20%', 'Middle 20%', 'Fourth 20%', 'Top 20%', 'Top 1%'],
+                    datasets: [{
+                        label: 'Share of Total Income (%)',
+                        data: [3, 8, 14, 23, 52, 20],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(255, 159, 64, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Percentage of Total Income'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Income Distribution by Population Segment'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Income comparison calculator
+            document.getElementById('calculateBtn').addEventListener('click', function() {
+                const income = parseFloat(document.getElementById('income').value);
+                const country = document.getElementById('country').value;
+                
+                if (isNaN(income) || income <= 0) {
+                    alert('Please enter a valid income amount');
+                    return;
+                }
+                
+                // Hypothetical data for different countries
+                const countryData = {
+                    usa: { median: 68000, top10: 170000, top1: 550000 },
+                    uk: { median: 42000, top10: 105000, top1: 350000 },
+                    germany: { median: 53000, top10: 132000, top1: 430000 },
+                    india: { median: 3200, top10: 8000, top1: 26000 },
+                    brazil: { median: 7500, top10: 19000, top1: 62000 }
+                };
+                
+                const data = countryData[country];
+                let position = '';
+                
+                if (income < data.median * 0.5) {
+                    position = 'in the bottom 20% of income earners';
+                } else if (income < data.median) {
+                    position = 'in the lower middle class (20th to 50th percentile)';
+                } else if (income < data.median * 1.5) {
+                    position = 'in the middle class (50th to 70th percentile)';
+                } else if (income < data.top10) {
+                    position = 'in the upper middle class (70th to 90th percentile)';
+                } else if (income < data.top1) {
+                    position = 'in the top 10% of income earners';
+                } else {
+                    position = 'in the top 1% of income earners';
+                }
+                
+                document.getElementById('resultText').textContent = 
+                    `With an annual income of $${income.toLocaleString()}, you are ${position} in ${document.getElementById('country').options[document.getElementById('country').selectedIndex].text}.`;
+                
+                document.getElementById('result').style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
